@@ -1,0 +1,26 @@
+#GameBoard{
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    grid-gap: 5px;
+    width: 40vh;
+    height: 48vh;
+}
+
+.GameBoardRow{
+    display: grid;
+    grid-gap: 10px;
+    /* column-gap: 10px; */
+}
+.GameBoardTile{
+    display: inline-flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    line-height: 2rem;
+    font-weight: bold;
+    vertical-align: middle;
+    text-transform: uppercase;
+    user-select: none;
+    border: 2px solid rgb(66, 64, 64);
+}
