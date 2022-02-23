@@ -1,17 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./gameboard.css";
 
-export default function GameBoard({ noOfRows, noOfCols }) {
+export default function GameBoard({ noOfRows, noOfCols, currentRow, boardData }) {
 	return (
 		<div id="GameBoard">
-			{[...Array(noOfRows)].map((_, i) => {
+			{boardData.map((row, i) => {
 				return (
-					<div className="GameBoardRow" style={{gridTemplateColumns: `repeat(5,1fr)`}}>
-						{[...Array(noOfCols)].map((_, j) => {
-						return	(
-                            <div className="GameBoardTile">
-
-                            </div>)
+					<div
+						key={i}
+						className={i == currentRow ? "GameBoardRow currentRow" : "GameBoardRow"}
+						style={{ gridTemplateColumns: `repeat(5,1fr)` }}
+					>
+						{[...boardData[i]].map((_, j) => {
+							return (
+								<div key={(i + 1) * 100 + j} className="GameBoardTile">
+									{boardData[i][j] ? boardData[i][j] : ""}
+								</div>
+							);
 						})}
 					</div>
 				);

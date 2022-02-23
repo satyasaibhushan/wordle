@@ -10,10 +10,12 @@
 	margin: 0 auto 10px;
 	touch-action: manipulation;
 	height: 100%;
+	user-select: none;
 }
 .KeyBoardKeys,
 .KeyBoardHalfSpaces,
 .KeyBoardOneAndHalfSpaces {
+	user-select: none;
 	display: flex;
 	width: 100%;
 	touch-action: manipulation;
