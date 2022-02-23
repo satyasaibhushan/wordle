@@ -17,7 +17,7 @@ export default function KeyBoard({ height ,onKey}) {
 							if (letter === 0.5) return <div key={10 * (i + 1) + j} className="KeyBoardHalfSpaces"></div>;
 							else if (letter === 1.5)
 								return (
-									<button key={10 * (i + 1) + j} onClick={()=>{onKey(j === 0 ? "enter" : "delete")}} className="KeyBoardOneAndHalfSpaces">
+									<button key={10 * (i + 1) + j} onClick={()=>{onKey(j === 0 ? "Enter" : "Backspace")}} className="KeyBoardOneAndHalfSpaces">
 										{j === 0 ? "enter" : "del"}
 									</button>
 								);

@@ -1,10 +1,14 @@
-import React, { useState, useReducer } from "react";
+import React, { useState, useReducer, useEffect, useRef } from "react";
 import "./game.css";
 import KeyBoard from "../KeyBoard/keyboard";
 import GameBoard from "../GameBoard/gameboard";
 let noOfRows = 6,
 	noOfCols = 5;
 let initialBoard = [...Array(noOfRows)].map((e) => [...Array(noOfCols)].map((ele) => ""));
+
+const isValid = (key) => {
+	return (/[a-zA-Z]/.test(key) && key.length == 1) || key === "Enter" || key == "Backspace";
+};
 let setVal = (arr, i, j, val) => {
 	return arr.map((innerArray, x) => {
 		if (x === i)
@@ -18,19 +22,21 @@ let setVal = (arr, i, j, val) => {
 
 const reducer = (state, action) => {
 	switch (action.type) {
-		case "enter":
+		case "Enter":
 			if (action.currentCol != noOfCols) {
 				console.log("not a complete word");
 				return state;
 			} else {
 				console.log("entered a word", action.boardData[action.currentRow].join(""));
+				action.setRow(action.currentRow + 1);
 				if (action.currentRow != noOfRows - 1) {
-					action.setRow(action.currentRow + 1);
 					action.setCol(0);
-				} else console.log("game over");
+				} else {
+					console.log("game over");
+				}
 				return state;
 			}
-		case "delete":
+		case "Backspace":
 			if (action.currentCol === 0) {
 				console.log("empty word");
 				return state;
@@ -50,18 +56,54 @@ const reducer = (state, action) => {
 };
 
 export default function Game(props) {
-	let [currentRow, setRow] = useState(0);
-	let [currentCol, setCol] = useState(0);
+	let [currentRow, _setRow] = useState(0);
+	let [currentCol, _setCol] = useState(0);
+
+	let currentRowRef = useRef(currentRow);
+	const setRow = (val) => {
+		currentRowRef.current = val;
+		_setRow(val);
+	};
+	let currentColRef = useRef(currentCol);
+	const setCol = (val) => {
+		currentColRef.current = val;
+		_setCol(val);
+	};
 
 	const [boardData, setBoard] = useReducer(reducer, initialBoard);
 
-	let enterKey = (key) => {
-		if (key === "enter" || key == "delete") setBoard({ type: key, currentCol, currentRow, setCol, setRow, boardData });
-		else {
-			setBoard({ type: "key", value: key, currentCol, currentRow, setCol, setRow, boardData });
-		}
+	let currentDataRef = useRef(boardData);
+
+	// console.log(currentDataRef.current);
+
+	let getState = () => {
+		return {
+			currentCol: currentColRef.current,
+			currentRow: currentRowRef.current,
+			setCol,
+			setRow,
+			boardData: currentDataRef.current,
+		};
 	};
-	console.log(currentRow, currentCol);
+
+	let processKey = (key) => {
+		if (key === "Enter" || key == "Backspace") setBoard({ type: key, ...getState() });
+		else setBoard({ type: "key", value: key, ...getState() });
+	};
+
+	useEffect(() => {
+		currentDataRef.current = boardData;
+	}, [boardData]);
+
+	useEffect(() => {
+		let listner = document.addEventListener("keydown", (e) => {
+			if (e.key === "Enter") e.preventDefault();
+			if (isValid(e.key)) processKey(e.key);
+		});
+		return () => {
+			listner.remove();
+		};
+	}, []);
 
 	return (
 		<div id="Game">
@@ -75,7 +117,7 @@ export default function Game(props) {
 					boardData={boardData}
 				/>
 			</div>
-			<KeyBoard height={"27vh"} onKey={(key) => enterKey(key)} />
+			<KeyBoard height={"27vh"} onKey={(key) => processKey(key)} />
 		</div>
 	);
 }
