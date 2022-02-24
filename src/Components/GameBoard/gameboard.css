@@ -1,26 +1,58 @@
-#GameBoard{
-    display: grid;
-    grid-template-rows: repeat(6, 1fr);
-    grid-gap: 5px;
-    width: 40vh;
-    height: 48vh;
+#GameBoard {
+	display: grid;
+	grid-template-rows: repeat(6, 1fr);
+	grid-gap: 5px;
+	width: 40vh;
+	height: 48vh;
 }
 
-.GameBoardRow{
-    display: grid;
-    grid-gap: 10px;
-    /* column-gap: 10px; */
+.GameBoardRow {
+	display: grid;
+	grid-gap: 10px;
+	/* column-gap: 10px; */
 }
-.GameBoardTile{
-    display: inline-flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-    line-height: 2rem;
-    font-weight: bold;
-    vertical-align: middle;
-    text-transform: uppercase;
-    user-select: none;
-    border: 2px solid rgb(66, 64, 64);
+.GameBoardTile {
+	display: inline-flex;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+	font-size: 2rem;
+	line-height: 2rem;
+	font-weight: bold;
+	vertical-align: middle;
+	text-transform: uppercase;
+	user-select: none;
+	border: 2px solid rgb(66, 64, 64);
+}
+
+@keyframes flip-in {
+	0% {
+		background-color: transparent;
+		transform: rotateX(0);
+	}
+	100% {
+		transform: rotateX(-90deg);
+		background-color: transparent;
+	}
+}
+@keyframes flip-out {
+	0% {
+		transform: rotateX(-90deg);
+	}
+	100% {
+		transform: rotateX(0deg);
+	}
+}
+.GameBoardTile.absent {
+	background-color: #6f6f75;
+}
+.GameBoardTile.present {
+	background-color: #b9a33e;
+}
+.GameBoardTile.correct {
+	background-color: #518a4c;
+}
+
+.GameBoardTile.flipping {
+	animation: flip-in 400ms ease-in-out, flip-out 400ms ease-in-out 400ms;
 }

@@ -1,9 +1,34 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import "./gameboard.css";
 
-export default function GameBoard({ noOfRows, noOfCols,boardData }) {
+let getClassName = (val) => {
+	switch (val) {
+		case 0:
+			return "absent";
+		case 1:
+			return "present";
+		case 2:
+			return "correct";
+		default:
+			return "";
+	}
+};
+
+export default function GameBoard({ noOfRows, noOfCols, boardData }) {
+	const board = useRef(null);
+	useEffect(() => {
+		if (boardData.currentRow !== 0) {
+			for (let i = 0; i < boardData.board[0].length; i++) {
+				setTimeout(() => {
+					let ele = board.current.children[boardData.currentRow - 1].children[i];
+					ele.classList.add("flipping");
+					ele.classList.add(getClassName(boardData.evaluation[boardData.currentRow - 1][i]));
+				}, i * 150);
+			}
+		}
+	}, [boardData.currentRow]);
 	return (
-		<div id="GameBoard">
+		<div id="GameBoard" ref={board}>
 			{boardData.board.map((row, i) => {
 				return (
 					<div
@@ -13,7 +38,7 @@ export default function GameBoard({ noOfRows, noOfCols,boardData }) {
 					>
 						{[...boardData.board[i]].map((_, j) => {
 							return (
-								<div key={(i + 1) * 100 + j} className="GameBoardTile">
+								<div key={(i + 1) * 100 + j} className={`GameBoardTile`}>
 									{boardData.board[i][j] ? boardData.board[i][j] : ""}
 								</div>
 							);

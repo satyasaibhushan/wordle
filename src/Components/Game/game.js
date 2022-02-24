@@ -6,9 +6,11 @@ let noOfRows = 6,
 	noOfCols = 5;
 let initialBoard = {
 	board: [...Array(noOfRows)].map((e) => [...Array(noOfCols)].map((ele) => "")),
+	evaluation: [...Array(noOfRows)].map((e) => [...Array(noOfCols)].map((ele) => "")),
 	currentCol: 0,
 	currentRow: 0,
 };
+let correctWord = "apple";
 
 const isValid = (key) => {
 	return (/[a-zA-Z]/.test(key) && key.length == 1) || key === "Enter" || key == "Backspace";
@@ -25,6 +27,22 @@ let setVal = (arr, i, j, val) => {
 	});
 };
 
+let getEvaluation = (guess, correct) => {
+	//0 => not present => black
+	//1 => present => yellow
+	//2 => correct => green
+	guess = guess.split("");
+	return guess.map((ele, i) => {
+		if (correct[i] === ele) {
+			correct = correct.replace(ele, " ");
+			return 2;
+		} else if (correct.includes(ele)) {
+			correct = correct.replace(ele, " ");
+			return 1;
+		} else return 0;
+	});
+};
+
 const reducer = (state, action) => {
 	switch (action.type) {
 		case "Enter":
@@ -32,9 +50,19 @@ const reducer = (state, action) => {
 				console.log("not a complete word");
 				return state;
 			} else {
-				console.log("entered a word", action.board[action.currentRow].join(""));
+				let enteredWord = action.board[action.currentRow].join("");
+				console.log("entered a word", enteredWord);
 				if (action.currentRow != noOfRows - 1) {
-					return { ...state, currentCol: 0, currentRow: action.currentRow + 1 };
+					let result = getEvaluation(enteredWord, correctWord);
+					console.log(result);
+					if (result.every((val) => val === 2)) console.log("game over");
+					action.evaluation.splice(action.currentRow, 1, result);
+					return {
+						...state,
+						evaluation: action.evaluation,
+						currentCol: 0,
+						currentRow: action.currentRow + 1,
+					};
 				} else {
 					console.log("game over");
 					return { ...state, currentRow: action.currentRow + 1 };
@@ -73,11 +101,12 @@ export default function Game(props) {
 		if (key === "Enter" || key == "Backspace") setBoard({ type: key, ...currentDataRef.current });
 		else setBoard({ type: "key", value: key, ...currentDataRef.current });
 	};
-	
+	console.log(boardData);
+
 	useEffect(() => {
 		currentDataRef.current = boardData;
 	}, [boardData]);
-	
+
 	useEffect(() => {
 		document.addEventListener("keydown", (e) => {
 			if (e.key === "Enter") e.preventDefault();
@@ -90,11 +119,10 @@ export default function Game(props) {
 			});
 		};
 	}, []);
-	
-	
+
 	return (
 		<div id="Game">
-			<header id="GameHead"></header>
+			<header id="GameHead"> Wordle</header>
 			<div id="GameBoardContainer">
 				<GameBoard noOfRows={noOfRows} noOfCols={noOfCols} boardData={boardData} />
 			</div>
