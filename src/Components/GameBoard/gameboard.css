@@ -54,5 +54,5 @@
 }
 
 .GameBoardTile.flipping {
-	animation: flip-in 400ms ease-in-out, flip-out 400ms ease-in-out 400ms;
+	animation: flip-in 300ms ease-out, flip-out 300ms ease-in 300ms;
 }

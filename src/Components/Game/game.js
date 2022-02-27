@@ -9,6 +9,7 @@ let initialBoard = {
 	evaluation: [...Array(noOfRows)].map((e) => [...Array(noOfCols)].map((ele) => "")),
 	currentCol: 0,
 	currentRow: 0,
+	isOver: false,
 };
 let correctWord = "apple";
 
@@ -51,22 +52,27 @@ const reducer = (state, action) => {
 				return state;
 			} else {
 				let enteredWord = action.board[action.currentRow].join("");
-				console.log("entered a word", enteredWord);
-				if (action.currentRow != noOfRows - 1) {
-					let result = getEvaluation(enteredWord, correctWord);
-					console.log(result);
-					if (result.every((val) => val === 2)) console.log("game over");
-					action.evaluation.splice(action.currentRow, 1, result);
+				console.log(`entered a word "${enteredWord}"`);
+
+				let result = getEvaluation(enteredWord, correctWord);
+				// console.log(result);
+				action.evaluation.splice(action.currentRow, 1, result);
+				if (result.every((val) => val === 2) || action.currentRow >= noOfRows - 1) {
+					console.log("game over");
 					return {
 						...state,
 						evaluation: action.evaluation,
 						currentCol: 0,
 						currentRow: action.currentRow + 1,
+						isOver: true,
 					};
-				} else {
-					console.log("game over");
-					return { ...state, currentRow: action.currentRow + 1 };
 				}
+				return {
+					...state,
+					evaluation: action.evaluation,
+					currentCol: 0,
+					currentRow: action.currentRow + 1,
+				};
 			}
 		case "Backspace":
 			if (action.currentCol === 0) {
@@ -98,27 +104,30 @@ export default function Game(props) {
 	let currentDataRef = useRef(boardData);
 
 	let processKey = (key) => {
-		if (key === "Enter" || key == "Backspace") setBoard({ type: key, ...currentDataRef.current });
-		else setBoard({ type: "key", value: key, ...currentDataRef.current });
+		if (!boardData.isOver) {
+			if (key === "Enter" || key == "Backspace") setBoard({ type: key, ...currentDataRef.current });
+			else setBoard({ type: "key", value: key, ...currentDataRef.current });
+		}
 	};
-	console.log(boardData);
+	let handleEvent = (e) => {
+		if (e.key === "Enter") e.preventDefault();
+		if (isValid(e.key)) processKey(e.key);
+	};
 
 	useEffect(() => {
 		currentDataRef.current = boardData;
 	}, [boardData]);
 
 	useEffect(() => {
-		document.addEventListener("keydown", (e) => {
-			if (e.key === "Enter") e.preventDefault();
-			if (isValid(e.key)) processKey(e.key);
-		});
+		if (boardData.isOver) {
+			document.removeEventListener("keydown", handleEvent);
+		} else {
+			document.addEventListener("keydown", handleEvent);
+		}
 		return () => {
-			document.removeEventListener("keydown", (e) => {
-				if (e.key === "Enter") e.preventDefault();
-				if (isValid(e.key)) processKey(e.key);
-			});
+			document.removeEventListener("keydown", handleEvent);
 		};
-	}, []);
+	}, [boardData.isOver]);
 
 	return (
 		<div id="Game">
@@ -126,7 +135,7 @@ export default function Game(props) {
 			<div id="GameBoardContainer">
 				<GameBoard noOfRows={noOfRows} noOfCols={noOfCols} boardData={boardData} />
 			</div>
-			<KeyBoard height={"27vh"} onKey={(key) => processKey(key)} />
+			<KeyBoard height={"27vh"} onKey={(key) => processKey(key)} isOver={boardData.isOver} />
 		</div>
 	);
 }

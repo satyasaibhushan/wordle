@@ -7,7 +7,7 @@ let alphabets = [
 	[1.5, "z", "x", "c", "v", "b", "n", "m", 1.5], // 1&1/2 + 7 + 1&1/2
 ];
 
-export default function KeyBoard({ height ,onKey}) {
+export default function KeyBoard({ height, onKey, isOver }) {
 	return (
 		<div id="GameKeyBoardContainer" style={{ height: height }}>
 			{alphabets.map((ele, i) => {
@@ -17,13 +17,25 @@ export default function KeyBoard({ height ,onKey}) {
 							if (letter === 0.5) return <div key={10 * (i + 1) + j} className="KeyBoardHalfSpaces"></div>;
 							else if (letter === 1.5)
 								return (
-									<button key={10 * (i + 1) + j} onClick={()=>{onKey(j === 0 ? "Enter" : "Backspace")}} className="KeyBoardOneAndHalfSpaces">
+									<button
+										key={10 * (i + 1) + j}
+										onClick={() => {
+											onKey(j === 0 ? "Enter" : "Backspace");
+										}}
+										className="KeyBoardOneAndHalfSpaces"
+									>
 										{j === 0 ? "enter" : "del"}
 									</button>
 								);
 							else
 								return (
-									<button onClick={()=>{onKey(letter)}} key={10 * (i + 1) + j} className="KeyBoardKeys">
+									<button
+										onClick={() => {
+											if (!isOver) onKey(letter);
+										}}
+										key={10 * (i + 1) + j}
+										className="KeyBoardKeys"
+									>
 										{letter.toUpperCase()}
 									</button>
 								);

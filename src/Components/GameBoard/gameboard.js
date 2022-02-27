@@ -17,13 +17,13 @@ let getClassName = (val) => {
 export default function GameBoard({ noOfRows, noOfCols, boardData }) {
 	const board = useRef(null);
 	useEffect(() => {
-		if (boardData.currentRow !== 0) {
+		if (boardData.currentRow !== 0 && boardData.currentRow <= noOfRows) {
 			for (let i = 0; i < boardData.board[0].length; i++) {
 				setTimeout(() => {
 					let ele = board.current.children[boardData.currentRow - 1].children[i];
 					ele.classList.add("flipping");
 					ele.classList.add(getClassName(boardData.evaluation[boardData.currentRow - 1][i]));
-				}, i * 150);
+				}, i * 100);
 			}
 		}
 	}, [boardData.currentRow]);
