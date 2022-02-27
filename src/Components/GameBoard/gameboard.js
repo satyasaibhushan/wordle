@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import "./gameboard.css";
 
-let getClassName = (val) => {
+export let getClassName = (val) => {
 	switch (val) {
 		case 0:
 			return "absent";
@@ -19,11 +19,14 @@ export default function GameBoard({ noOfRows, noOfCols, boardData }) {
 	useEffect(() => {
 		if (boardData.currentRow !== 0 && boardData.currentRow <= noOfRows) {
 			for (let i = 0; i < boardData.board[0].length; i++) {
+				let ele = board.current.children[boardData.currentRow - 1].children[i];
 				setTimeout(() => {
-					let ele = board.current.children[boardData.currentRow - 1].children[i];
 					ele.classList.add("flipping");
 					ele.classList.add(getClassName(boardData.evaluation[boardData.currentRow - 1][i]));
 				}, i * 100);
+				setTimeout(() => {
+					ele.classList.remove("flipping");
+				}, (i * 200)+1000);
 			}
 		}
 	}, [boardData.currentRow]);
@@ -33,7 +36,7 @@ export default function GameBoard({ noOfRows, noOfCols, boardData }) {
 				return (
 					<div
 						key={i}
-						className={i == boardData.currentRow ? "GameBoardRow currentRow" : "GameBoardRow"}
+						className={i === boardData.currentRow ? "GameBoardRow currentRow" : "GameBoardRow"}
 						style={{ gridTemplateColumns: `repeat(5,1fr)` }}
 					>
 						{[...boardData.board[i]].map((_, j) => {

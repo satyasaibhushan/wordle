@@ -1,7 +1,7 @@
 #GameKeyBoardContainer {
 	display: flex;
 	flex-direction: column;
-    margin: 4px 8px;
+	margin: 4px 8px;
 }
 
 .KeyBoardRow {
@@ -25,7 +25,7 @@
 	border-radius: 4px;
 	border-color: transparent;
 	margin: 0 3px;
-    cursor: pointer;
+	cursor: pointer;
 	/* border-color: transparent; */
 }
 .KeyBoardHalfSpaces {
@@ -33,4 +33,13 @@
 }
 .KeyBoardOneAndHalfSpaces {
 	flex: 1.5;
+}
+.KeyBoardKeys.absent {
+	background-color: #6f6f75;
+}
+.KeyBoardKeys.present {
+	background-color: #b9a33e;
+}
+.KeyBoardKeys.correct {
+	background-color: #518a4c;
 }

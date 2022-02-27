@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect, useRef } from "react";
+import React, { useReducer, useEffect, useRef } from "react";
 import "./game.css";
 import KeyBoard from "../KeyBoard/keyboard";
 import GameBoard from "../GameBoard/gameboard";
@@ -12,9 +12,10 @@ let initialBoard = {
 	isOver: false,
 };
 let correctWord = "apple";
+let keyData = [...Array(26)].map((_) => -1);
 
 const isValid = (key) => {
-	return (/[a-zA-Z]/.test(key) && key.length == 1) || key === "Enter" || key == "Backspace";
+	return (/[a-zA-Z]/.test(key) && key.length === 1) || key === "Enter" || key === "Backspace";
 };
 
 let setVal = (arr, i, j, val) => {
@@ -44,10 +45,24 @@ let getEvaluation = (guess, correct) => {
 	});
 };
 
+let setKeyData = (guess, evaluation) => {
+	guess = guess.split("");
+	for (let i = 0; i < guess.length; i++) {
+		const element = guess[i].charCodeAt(0) - "a".charCodeAt(0);
+		console.log(element);
+		if (keyData[element] === 2) continue;
+		else if (keyData[element] === 0) continue;
+		else {
+			if (keyData[element] === 1 && evaluation[i] === 2) keyData[element] = 2;
+			else if (keyData[element] === -1) keyData[element] = evaluation[i];
+		}
+	}
+};
+
 const reducer = (state, action) => {
 	switch (action.type) {
 		case "Enter":
-			if (action.currentCol != noOfCols) {
+			if (action.currentCol !== noOfCols) {
 				console.log("not a complete word");
 				return state;
 			} else {
@@ -55,6 +70,7 @@ const reducer = (state, action) => {
 				console.log(`entered a word "${enteredWord}"`);
 
 				let result = getEvaluation(enteredWord, correctWord);
+				setKeyData(enteredWord, result);
 				// console.log(result);
 				action.evaluation.splice(action.currentRow, 1, result);
 				if (result.every((val) => val === 2) || action.currentRow >= noOfRows - 1) {
@@ -86,7 +102,7 @@ const reducer = (state, action) => {
 				};
 			}
 		case "key":
-			if (action.currentCol == noOfCols) {
+			if (action.currentCol === noOfCols) {
 				console.log("word already filled", action.currentCol);
 				return state;
 			} else {
@@ -96,6 +112,8 @@ const reducer = (state, action) => {
 					board: setVal(state.board, action.currentRow, action.currentCol, action.value),
 				};
 			}
+		default:
+			return state;
 	}
 };
 
@@ -103,9 +121,11 @@ export default function Game(props) {
 	let [boardData, setBoard] = useReducer(reducer, initialBoard);
 	let currentDataRef = useRef(boardData);
 
+	console.log(keyData);
+
 	let processKey = (key) => {
 		if (!boardData.isOver) {
-			if (key === "Enter" || key == "Backspace") setBoard({ type: key, ...currentDataRef.current });
+			if (key === "Enter" || key === "Backspace") setBoard({ type: key, ...currentDataRef.current });
 			else setBoard({ type: "key", value: key, ...currentDataRef.current });
 		}
 	};
@@ -135,7 +155,7 @@ export default function Game(props) {
 			<div id="GameBoardContainer">
 				<GameBoard noOfRows={noOfRows} noOfCols={noOfCols} boardData={boardData} />
 			</div>
-			<KeyBoard height={"27vh"} onKey={(key) => processKey(key)} isOver={boardData.isOver} />
+			<KeyBoard height={"27vh"} onKey={(key) => processKey(key)} isOver={boardData.isOver} keyData={keyData} />
 		</div>
 	);
 }
