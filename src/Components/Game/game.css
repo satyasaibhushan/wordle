@@ -5,23 +5,51 @@
 	display: flex;
 	flex-direction: column;
 	margin: 0 auto;
-    background-color: grey;
+	background-color: grey;
 }
 
-#GameHead{
-    display: flex;
-    align-items: center;
+#GameHead {
+	display: flex;
+	align-items: center;
+	
+
+	justify-content: center;
+	font-size: 2.5rem;
+	font-family: Arial, Helvetica, sans-serif;
+	flex: 0 1 auto;
+	width: 150px;
+	/* height: 100px; */
+	position: absolute; /* new */
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+#GameBoardContainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-grow: 1;
+}
+#hardModeContainer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	margin-top: 2px;
+	float: right;
+	flex: 0 1 auto;
+	width: 100px;
+	/* height: 100px; */
+	margin-left: auto;
+}
+
+/* #hardModeLabel {
+    color: gray; 
+    font-size: 10px;
+  } */
+.headerContainer {
+	display: flex;
+	border-bottom: 1px solid rgb(167, 165, 165);
+	justify-content: center;
     height: 50px;
-    border-bottom: 1px solid rgb(167, 165, 165);
-    justify-content: center;
-    font-size: 2.5rem;
-    font-family: Arial, Helvetica, sans-serif;
 }
-
-#GameBoardContainer{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-}
-

@@ -4,6 +4,8 @@ import KeyBoard from "../KeyBoard/keyboard";
 import GameBoard from "../GameBoard/gameboard";
 import { ToastContainer, toast, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ToggleButton from "react-toggle-button";
+import { setCookie, getCookie } from "../../functionalities/cookies";
 
 let noOfRows = 6,
 	noOfCols = 5;
@@ -13,11 +15,14 @@ let initialBoard = {
 	currentCol: 0,
 	currentRow: 0,
 	isOver: false,
+	isHardMode: getCookie("isHardMode") && getCookie("isHardMode") === "true",
 };
 let correctWord = "apple";
 let keyData = [...Array(26)].map((_) => -1);
+let correctLetters = [null, null, null, null, null];
+let presentLetters = [];
 
-const isValid = (key) => {
+const isValidKey = (key) => {
 	return (/[a-zA-Z]/.test(key) && key.length === 1) || key === "Enter" || key === "Backspace";
 };
 
@@ -61,6 +66,54 @@ let setKeyData = (guess, evaluation) => {
 	}
 };
 
+let isValidGuess = (guess, evaluation) => {
+	// for hard mode
+	let x = guess;
+	for (let i = 0; i < noOfCols; i++) {
+		if (correctLetters[i] && correctLetters[i] !== guess[i]) {
+			let pos;
+			switch (i) {
+				case 0:
+					pos = "1st";
+					break;
+				case 1:
+					pos = "2nd";
+					break;
+				case 2:
+					pos = "3rd";
+					break;
+				case 3:
+					pos = "4th";
+					break;
+				default:
+					pos = "5th";
+			}
+			return [false, `${pos} letter must be ${correctLetters[i]}`];
+		} else x = x.replace(correctLetters[i], "");
+		// else
+	}
+
+	if (presentLetters.length) {
+		for (let i = 0; i < presentLetters.length; i++) {
+			if (!x.split("").includes(presentLetters[i])) {
+				return [false, `Guess must contain ${presentLetters[i]}`];
+			} else {
+				x = x.replace(presentLetters[i], "");
+			}
+		}
+	}
+
+	presentLetters = [];
+	correctLetters = [];
+	evaluation.forEach((element, i) => {
+		if (element == 1) presentLetters.push(guess[i]);
+		else if (element == 2) correctLetters[i] = guess[i];
+	});
+	console.log(presentLetters, correctLetters);
+
+	return [true, ""];
+};
+
 const reducer = (state, action) => {
 	switch (action.type) {
 		case "Enter":
@@ -77,11 +130,24 @@ const reducer = (state, action) => {
 				console.log(`entered a word "${enteredWord}"`);
 
 				let result = getEvaluation(enteredWord, correctWord);
+				if (action.isHardMode) {
+					let [isValid, message] = isValidGuess(enteredWord, result);
+					console.log([isValid, message]);
+					if (!isValid) {
+						if (!toast.isActive("invalidGuess")) {
+							toast(message, {
+								toastId: "invalidGuess",
+							});
+						}
+						return state;
+					}
+				}
+
 				setKeyData(enteredWord, result);
 				// console.log(result);
 				action.evaluation.splice(action.currentRow, 1, result);
 				if (result.every((val) => val === 2) || action.currentRow >= noOfRows - 1) {
-					action.currentRow < noOfRows - 1
+					result.every((val) => val === 2)
 						? toast("Hurray!!", {
 								toastId: "success",
 						  })
@@ -136,6 +202,17 @@ const reducer = (state, action) => {
 					board: setVal(state.board, action.currentRow, action.currentCol, action.value),
 				};
 			}
+		case "setHardMode":
+			if (action.currentRow !== 0) {
+				if (!toast.isActive("invalidHardSwitch")) {
+					toast("You can only switch before the game", {
+						toastId: "invalidHardSwitch",
+					});
+				}
+				return state;
+			}
+			setCookie("isHardMode", !action.value, 20);
+			return { ...state, isHardMode: !action.value };
 		default:
 			return state;
 	}
@@ -153,7 +230,7 @@ export default function Game(props) {
 	};
 	let handleEvent = (e) => {
 		if (e.key === "Enter") e.preventDefault();
-		if (isValid(e.key)) processKey(e.key);
+		if (isValidKey(e.key)) processKey(e.key);
 	};
 
 	useEffect(() => {
@@ -173,7 +250,22 @@ export default function Game(props) {
 
 	return (
 		<div id="Game">
-			<header id="GameHead"> Wordle</header>
+			<div className="headerContainer">
+				<header id="GameHead"> Wordle</header>
+				<div id="hardModeContainer">
+					<ToggleButton
+						value={boardData.isHardMode}
+						onToggle={(val) => {
+							setBoard({ type: "setHardMode", value: val, ...currentDataRef.current });
+						}}
+						style={{ transform: "scale(0.5)" }}
+					/>
+					<label htmlFor="hard-mode-toggle" id="hardModeLabel">
+						Hard mode
+					</label>
+				</div>
+			</div>
+
 			<div id="GameBoardContainer">
 				<GameBoard noOfRows={noOfRows} noOfCols={noOfCols} boardData={boardData} />
 			</div>
