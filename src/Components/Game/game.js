@@ -2,6 +2,9 @@ import React, { useReducer, useEffect, useRef } from "react";
 import "./game.css";
 import KeyBoard from "../KeyBoard/keyboard";
 import GameBoard from "../GameBoard/gameboard";
+import { ToastContainer, toast, Slide } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 let noOfRows = 6,
 	noOfCols = 5;
 let initialBoard = {
@@ -49,7 +52,6 @@ let setKeyData = (guess, evaluation) => {
 	guess = guess.split("");
 	for (let i = 0; i < guess.length; i++) {
 		const element = guess[i].charCodeAt(0) - "a".charCodeAt(0);
-		console.log(element);
 		if (keyData[element] === 2) continue;
 		else if (keyData[element] === 0) continue;
 		else {
@@ -63,7 +65,12 @@ const reducer = (state, action) => {
 	switch (action.type) {
 		case "Enter":
 			if (action.currentCol !== noOfCols) {
-				console.log("not a complete word");
+				if (!toast.isActive("incomplete")) {
+					toast("not a complete word", {
+						toastId: "incomplete",
+					});
+				}
+				// console.log("not a complete word");
 				return state;
 			} else {
 				let enteredWord = action.board[action.currentRow].join("");
@@ -74,7 +81,14 @@ const reducer = (state, action) => {
 				// console.log(result);
 				action.evaluation.splice(action.currentRow, 1, result);
 				if (result.every((val) => val === 2) || action.currentRow >= noOfRows - 1) {
-					console.log("game over");
+					action.currentRow < noOfRows - 1
+						? toast("Hurray!!", {
+								toastId: "success",
+						  })
+						: toast(`Word is "${correctWord}" `, {
+								toastId: "loss",
+						  });
+					// console.log("game over");
 					return {
 						...state,
 						evaluation: action.evaluation,
@@ -92,7 +106,12 @@ const reducer = (state, action) => {
 			}
 		case "Backspace":
 			if (action.currentCol === 0) {
-				console.log("empty word");
+				if (!toast.isActive("emptyWord")) {
+					toast("Empty word", {
+						toastId: "emptyWord",
+					});
+				}
+				// console.log("empty word");
 				return state;
 			} else {
 				return {
@@ -103,7 +122,12 @@ const reducer = (state, action) => {
 			}
 		case "key":
 			if (action.currentCol === noOfCols) {
-				console.log("word already filled", action.currentCol);
+				if (!toast.isActive("alreadyFilled")) {
+					toast("word already filled", {
+						toastId: "alreadyFilled",
+					});
+				}
+				// console.log("word already filled", action.currentCol);
 				return state;
 			} else {
 				return {
@@ -120,8 +144,6 @@ const reducer = (state, action) => {
 export default function Game(props) {
 	let [boardData, setBoard] = useReducer(reducer, initialBoard);
 	let currentDataRef = useRef(boardData);
-
-	console.log(keyData);
 
 	let processKey = (key) => {
 		if (!boardData.isOver) {
@@ -156,6 +178,20 @@ export default function Game(props) {
 				<GameBoard noOfRows={noOfRows} noOfCols={noOfCols} boardData={boardData} />
 			</div>
 			<KeyBoard height={"27vh"} onKey={(key) => processKey(key)} isOver={boardData.isOver} keyData={keyData} />
+			<ToastContainer
+				position="top-center"
+				autoClose={2000}
+				hideProgressBar
+				newestOnTop={false}
+				closeOnClick={false}
+				rtl={false}
+				pauseOnFocusLoss
+				draggable={false}
+				pauseOnHover={false}
+				transition={Slide}
+				limit={3}
+				closeButton={false}
+			/>
 		</div>
 	);
 }
