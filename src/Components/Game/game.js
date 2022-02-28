@@ -9,6 +9,8 @@ import { setCookie, getCookie } from "../../utils/cookies";
 import { getAnswer } from "../../utils/answers";
 import { isValidGuess } from "../../utils/validGuesses";
 
+import getE, { bestE } from "../../AI/information";
+
 let noOfRows = 6,
 	noOfCols = 5;
 let initialBoard = {
@@ -109,8 +111,8 @@ let isValidGuessHardMode = (guess, evaluation) => {
 	presentLetters = [];
 	correctLetters = [];
 	evaluation.forEach((element, i) => {
-		if (element == 1) presentLetters.push(guess[i]);
-		else if (element == 2) correctLetters[i] = guess[i];
+		if (element === 1) presentLetters.push(guess[i]);
+		else if (element === 2) correctLetters[i] = guess[i];
 	});
 	console.log(presentLetters, correctLetters);
 
@@ -247,7 +249,9 @@ export default function Game(props) {
 
 	useEffect(() => {
 		correctWord = getAnswer(boardData.currentNumber);
-	}, []);
+		console.log(correctWord);
+		// bestE();
+	});
 
 	useEffect(() => {
 		currentDataRef.current = boardData;
