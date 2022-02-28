@@ -23,16 +23,19 @@
 	text-transform: uppercase;
 	user-select: none;
 	border: 2px solid rgb(66, 64, 64);
+	color: rgb(224, 221, 221);
 }
 
 @keyframes flip-in {
 	0% {
 		background-color: transparent;
+		border: 2px solid rgb(66, 64, 64);
 		transform: rotateX(0);
 	}
 	100% {
 		transform: rotateX(-90deg);
 		background-color: transparent;
+		border: 2px solid rgb(66, 64, 64);
 	}
 }
 @keyframes flip-out {
@@ -44,13 +47,16 @@
 	}
 }
 .GameBoardTile.absent {
-	background-color: #6f6f75;
+	background-color: #3a3a3c;
+	border-color: #3a3a3c;
 }
 .GameBoardTile.present {
 	background-color: #b9a33e;
+	border-color: #b9a33e;
 }
 .GameBoardTile.correct {
-	background-color: #518a4c;
+	background-color: #538d4e;
+	border-color: #538d4e;
 }
 
 .GameBoardTile.flipping {

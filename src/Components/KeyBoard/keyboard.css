@@ -34,12 +34,23 @@
 .KeyBoardOneAndHalfSpaces {
 	flex: 1.5;
 }
+.KeyBoardKeys,
+.KeyBoardOneAndHalfSpaces {
+	background-color: #818384;
+	color: rgb(232, 234, 235);
+	font-weight: bold;
+}
+.KeyBoardKeys {
+	transition-delay: 500ms;
+	transition-duration: 250ms;
+}
 .KeyBoardKeys.absent {
-	background-color: #6f6f75;
+	background-color: #3a3a3c;
+	/* border-color:  #3a3a3c; */
 }
 .KeyBoardKeys.present {
 	background-color: #b9a33e;
 }
 .KeyBoardKeys.correct {
-	background-color: #518a4c;
+	background-color: #538d4e;
 }
