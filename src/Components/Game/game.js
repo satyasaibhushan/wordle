@@ -5,7 +5,9 @@ import GameBoard from "../GameBoard/gameboard";
 import { ToastContainer, toast, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ToggleButton from "react-toggle-button";
-import { setCookie, getCookie } from "../../functionalities/cookies";
+import { setCookie, getCookie } from "../../utils/cookies";
+import { getAnswer } from "../../utils/answers";
+import { isValidGuess } from "../../utils/validGuesses";
 
 let noOfRows = 6,
 	noOfCols = 5;
@@ -16,6 +18,7 @@ let initialBoard = {
 	currentRow: 0,
 	isOver: false,
 	isHardMode: getCookie("isHardMode") && getCookie("isHardMode") === "true",
+	currentNumber: getCookie("answerNumber") ? getCookie("answerNumber") : 0,
 };
 let correctWord = "apple";
 let keyData = [...Array(26)].map((_) => -1);
@@ -66,7 +69,7 @@ let setKeyData = (guess, evaluation) => {
 	}
 };
 
-let isValidGuess = (guess, evaluation) => {
+let isValidGuessHardMode = (guess, evaluation) => {
 	// for hard mode
 	let x = guess;
 	for (let i = 0; i < noOfCols; i++) {
@@ -128,10 +131,18 @@ const reducer = (state, action) => {
 			} else {
 				let enteredWord = action.board[action.currentRow].join("");
 				console.log(`entered a word "${enteredWord}"`);
+				if (!isValidGuess(enteredWord)) {
+					if (!toast.isActive("invalidGuess")) {
+						toast("not a valid word", {
+							toastId: "invalidGuess",
+						});
+					}
+					return state;
+				}
 
 				let result = getEvaluation(enteredWord, correctWord);
 				if (action.isHardMode) {
-					let [isValid, message] = isValidGuess(enteredWord, result);
+					let [isValid, message] = isValidGuessHardMode(enteredWord, result);
 					console.log([isValid, message]);
 					if (!isValid) {
 						if (!toast.isActive("invalidGuess")) {
@@ -147,6 +158,7 @@ const reducer = (state, action) => {
 				// console.log(result);
 				action.evaluation.splice(action.currentRow, 1, result);
 				if (result.every((val) => val === 2) || action.currentRow >= noOfRows - 1) {
+					setCookie("answerNumber", JSON.parse(action.currentNumber) + 1, 30);
 					result.every((val) => val === 2)
 						? toast("Hurray!!", {
 								toastId: "success",
@@ -232,6 +244,10 @@ export default function Game(props) {
 		if (e.key === "Enter") e.preventDefault();
 		if (isValidKey(e.key)) processKey(e.key);
 	};
+
+	useEffect(() => {
+		correctWord = getAnswer(boardData.currentNumber);
+	}, []);
 
 	useEffect(() => {
 		currentDataRef.current = boardData;
